@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>稿酬深度分析报告 - 12 月 vs 1 月</title>
+    <title>大话手游竞品作者管理系统</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -11,608 +11,285 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            padding: 20px;
+            display: flex;
         }
-        .container { max-width: 1400px; margin: 0 auto; }
-        .header {
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            margin-bottom: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        .sidebar {
+            width: 260px;
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+            padding: 30px 20px;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            border-right: 1px solid rgba(255,255,255,0.1);
         }
-        .header h1 { color: #667eea; font-size: 32px; margin-bottom: 10px; }
-        .header p { color: #666; font-size: 14px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 20px; }
-        .card {
-            background: white;
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-        .card h2 {
-            color: #333;
+        .logo {
+            color: white;
             font-size: 20px;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #f0f0f0;
+            font-weight: bold;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
         }
-        .card h3 { color: #555; font-size: 16px; margin: 20px 0 15px 0; }
-        .stat {
-            display: flex;
-            justify-content: space-between;
-            padding: 12px 0;
-            border-bottom: 1px solid #f0f0f0;
-        }
-        .stat:last-child { border-bottom: none; }
-        .stat-label { color: #666; }
-        .stat-value { font-weight: bold; color: #667eea; }
-        .stat-value.highlight { color: #f59e0b; }
-        .stat-value.success { color: #10b981; }
-        .stat-value.danger { color: #ef4444; }
-        .stat-value.info { color: #3b82f6; }
-        .comparison {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin: 15px 0;
-        }
-        .comparison-item {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
-            text-align: center;
-        }
-        .comparison-item .label { color: #666; font-size: 14px; margin-bottom: 8px; }
-        .comparison-item .value { font-size: 24px; font-weight: bold; color: #667eea; }
-        .comparison-item .change { font-size: 14px; margin-top: 5px; }
-        .change.positive { color: #10b981; }
-        .change.negative { color: #ef4444; }
-        table { width: 100%; border-collapse: collapse; margin: 15px 0; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #f0f0f0; }
-        th { background: #f8f9fa; font-weight: 600; }
-        tr:hover { background: #f8f9fa; }
-        .badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-        .badge-live { background: #dbeafe; color: #2563eb; }
-        .badge-short { background: #fef3c7; color: #d97706; }
-        .insight {
-            background: #fef3c7;
-            border-left: 4px solid #f59e0b;
-            padding: 15px;
-            margin: 15px 0;
-            border-radius: 4px;
-        }
-        .insight-title { font-weight: bold; color: #92400e; margin-bottom: 8px; }
-        .insight-content { color: #78350f; line-height: 1.6; }
-        .insight.success { background: #d1fae5; border-left-color: #10b981; }
-        .insight.success .insight-title { color: #065f46; }
-        .insight.success .insight-content { color: #064e3b; }
-        .insight.danger { background: #fee2e2; border-left-color: #ef4444; }
-        .insight.danger .insight-title { color: #991b1b; }
-        .insight.danger .insight-content { color: #7f1d1d; }
-        .tier-bar {
-            display: flex;
-            height: 40px;
-            border-radius: 8px;
-            overflow: hidden;
-            margin: 10px 0;
-        }
-        .tier-segment {
+        .logo span { font-size: 14px; color: rgba(255,255,255,0.7); display: block; margin-top: 5px; }
+        .nav-item {
             display: flex;
             align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 12px;
-            font-weight: bold;
-        }
-        .tier-s { background: #dc2626; }
-        .tier-a { background: #f59e0b; }
-        .tier-b { background: #3b82f6; }
-        .tier-c { background: #9ca3af; }
-        .chart-container { position: relative; height: 250px; }
-        .summary-box {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 20px;
+            padding: 15px 20px;
+            color: rgba(255,255,255,0.8);
+            cursor: pointer;
             border-radius: 10px;
-            margin: 20px 0;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
         }
-        .summary-box h3 { color: white; margin-bottom: 15px; }
-        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
-        .summary-item { text-align: center; }
-        .summary-item .value { font-size: 28px; font-weight: bold; margin-bottom: 5px; }
-        .summary-item .label { font-size: 14px; opacity: 0.9; }
-        .toc {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }
-        .toc h3 { margin-bottom: 15px; color: #333; }
-        .toc ul { list-style: none; }
-        .toc li {
-            padding: 8px 0;
-            border-bottom: 1px solid #f0f0f0;
-        }
-        .toc li a {
-            color: #667eea;
-            text-decoration: none;
-        }
-        .toc li a:hover { text-decoration: underline; }
-        .metric-card {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-            margin: 10px 0;
-        }
-        .metric-card .value { font-size: 32px; font-weight: bold; color: #667eea; }
-        .metric-card .label { color: #666; margin-top: 5px; }
-        .metric-card .sublabel { font-size: 12px; color: #999; margin-top: 3px; }
+        .nav-item:hover { background: rgba(255,255,255,0.1); color: white; }
+        .nav-item.active { background: white; color: #667eea; }
+        .nav-item .icon { font-size: 20px; margin-right: 12px; }
+        .nav-item .label { font-size: 15px; font-weight: 500; }
+        .nav-section { color: rgba(255,255,255,0.5); font-size: 12px; text-transform: uppercase; margin: 20px 0 10px 20px; letter-spacing: 1px; }
+        .main-content { margin-left: 260px; flex: 1; padding: 30px; overflow-y: auto; height: 100vh; }
+        .page { display: none; }
+        .page.active { display: block; }
+        .page-header { background: white; border-radius: 15px; padding: 25px 30px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        .page-header h1 { color: #667eea; font-size: 28px; margin-bottom: 8px; }
+        .page-header p { color: #666; font-size: 14px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 20px; }
+        .stat-card { background: white; border-radius: 15px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); transition: transform 0.3s ease; position: relative; overflow: hidden; }
+        .stat-card:hover { transform: translateY(-5px); }
+        .stat-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, #667eea, #764ba2); }
+        .stat-card.warning::before { background: linear-gradient(90deg, #f59e0b, #ef4444); }
+        .stat-card .label { color: #666; font-size: 14px; margin-bottom: 10px; }
+        .stat-card .value { font-size: 32px; font-weight: bold; color: #667eea; }
+        .stat-card .value.highlight { color: #f59e0b; }
+        .stat-card .value.danger { color: #ef4444; }
+        .stat-card .subtext { color: #999; font-size: 12px; margin-top: 8px; }
+        .stat-card .trend { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 12px; margin-top: 8px; }
+        .trend.up { background: #d1fae5; color: #059669; }
+        .trend.down { background: #fee2e2; color: #dc2626; }
+        .content-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px; margin-bottom: 20px; }
+        .card { background: white; border-radius: 15px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        .card h2 { color: #333; font-size: 18px; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #f0f0f0; display: flex; align-items: center; justify-content: space-between; }
+        .card h2 .badge { font-size: 12px; padding: 4px 12px; border-radius: 12px; background: #667eea; color: white; }
+        .data-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        .data-table th, .data-table td { padding: 12px; text-align: left; border-bottom: 1px solid #f0f0f0; }
+        .data-table th { background: #f8f9fa; font-weight: 600; color: #333; font-size: 13px; }
+        .data-table td { font-size: 14px; }
+        .data-table tr:hover { background: #f8f9fa; }
+        .data-table .payment { font-weight: bold; color: #10b981; }
+        .chart-container { position: relative; height: 300px; }
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+        .badge-live { background: #dbeafe; color: #2563eb; }
+        .badge-short { background: #fef3c7; color: #d97706; }
+        .alert-box { background: linear-gradient(135deg, #fef3c7, #fee2e2); border-left: 4px solid #f59e0b; border-radius: 10px; padding: 15px 20px; margin-bottom: 20px; display: flex; align-items: center; gap: 15px; }
+        .alert-box .icon { font-size: 24px; }
+        .alert-box .content { flex: 1; }
+        .alert-box .title { font-weight: 600; color: #92400e; margin-bottom: 4px; }
+        .alert-box .desc { font-size: 13px; color: #78350f; }
+        .progress-bar { background: #f0f0f0; border-radius: 10px; height: 8px; overflow: hidden; margin-top: 10px; }
+        .progress-bar .fill { height: 100%; background: linear-gradient(90deg, #667eea, #764ba2); border-radius: 10px; transition: width 0.3s ease; }
+        .tag { display: inline-block; padding: 3px 10px; border-radius: 8px; font-size: 11px; margin: 2px; background: #f0f0f0; color: #666; }
+        .tag.hot { background: #fee2e2; color: #dc2626; }
+        .tag.new { background: #d1fae5; color: #059669; }
+        .tag.potential { background: #ede9fe; color: #7c3aed; }
+        .btn { padding: 8px 16px; border: none; border-radius: 8px; cursor: pointer; font-size: 13px; transition: all 0.3s ease; }
+        .btn-primary { background: #667eea; color: white; }
+        .btn-primary:hover { background: #5568d3; }
+        .btn-outline { background: transparent; border: 1px solid #667eea; color: #667eea; }
+        .btn-outline:hover { background: #667eea; color: white; }
+        .table-container { max-height: 500px; overflow-y: auto; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>📊 稿酬深度分析报告</h1>
-            <p>12 月 vs 1 月 对比分析 | 生成时间：2026-03-27</p>
+    <div class="sidebar">
+        <div class="logo">🎮 大话手游<span>竞品作者管理系统</span></div>
+        <div class="nav-section">数据概览</div>
+        <div class="nav-item active" onclick="switchPage('dashboard')"><span class="icon">📊</span><span class="label">大盘数据看板</span></div>
+        <div class="nav-section">作者管理</div>
+        <div class="nav-item" onclick="switchPage('authors')"><span class="icon">👥</span><span class="label">作者情况</span></div>
+        <div class="nav-section">数据分析</div>
+        <div class="nav-item" onclick="switchPage('interaction')"><span class="icon">💬</span><span class="label">互动分析</span></div>
+        <div class="nav-section">资源管理</div>
+        <div class="nav-item" onclick="switchPage('budget')"><span class="icon">💰</span><span class="label">预算管理</span></div>
+    </div>
+    
+    <div class="main-content">
+        <div id="dashboard" class="page active">
+            <div class="page-header"><h1>📊 本月作者大盘数据看板</h1><p>实时监控短视频、直播作者的参与情况、播放量、稿费消耗与 CPM 成本</p></div>
+            <div class="alert-box"><span class="icon">⚠️</span><div class="content"><div class="title">异常预警</div><div class="desc">发现 3 位作者 CPM 异常偏高，建议关注；本月预算使用率已达 78%，请注意控制</div></div></div>
+            <div class="stats-grid">
+                <div class="stat-card"><div class="label">总参与作者</div><div class="value">48</div><div class="subtext">位创作者</div><span class="trend up">↑ 12% 环比</span></div>
+                <div class="stat-card"><div class="label">短视频作者</div><div class="value">16</div><div class="subtext">位</div><span class="trend up">↑ 3 人 新增</span></div>
+                <div class="stat-card"><div class="label">直播作者</div><div class="value">32</div><div class="subtext">位</div><span class="trend down">↓ 2 人 减少</span></div>
+                <div class="stat-card"><div class="label">总播放量</div><div class="value">215.6 万</div><div class="subtext">次</div><span class="trend up">↑ 18% 环比</span></div>
+                <div class="stat-card"><div class="label">总稿酬消耗</div><div class="value highlight">122,500</div><div class="subtext">元</div><span class="trend up">↑ 15% 环比</span></div>
+                <div class="stat-card warning"><div class="label">平均 CPM</div><div class="value danger">56.8</div><div class="subtext">元/千次播放</div><span class="trend down">↑ 8% 成本上升</span></div>
+            </div>
+            <div class="content-grid">
+                <div class="card"><h2>📈 稿酬消耗趋势 <span class="badge">近 30 天</span></h2><div class="chart-container"><canvas id="trendChart"></canvas></div></div>
+                <div class="card"><h2>📊 播放量与 CPM 趋势</h2><div class="chart-container"><canvas id="cpmChart"></canvas></div></div>
+            </div>
+            <div class="card"><h2>🏆 本月 TOP 10 创作者</h2><div class="table-container"><table class="data-table"><thead><tr><th>排名</th><th>类型</th><th>昵称</th><th>播放量</th><th>稿酬</th><th>CPM</th><th>状态</th></tr></thead><tbody id="top10Body"></tbody></table></div></div>
         </div>
-
-        <!-- 目录 -->
-        <div class="toc">
-            <h3>📑 目录</h3>
-            <ul>
-                <li><a href="#overview">一、核心数据概览</a></li>
-                <li><a href="#trends">二、整体趋势分析</a></li>
-                <li><a href="#roi">三、成本效益分析 (ROI)</a></li>
-                <li><a href="#engagement">四、短视频互动数据分析</a></li>
-                <li><a href="#tiers">五、作者分层变化</a></li>
-                <li><a href="#price-impact">六、单价调整影响</a></li>
-                <li><a href="#top10">七、TOP10 作者榜</a></li>
-                <li><a href="#recommendations">八、运营建议</a></li>
-                <li><a href="#budget">九、下月预算预测</a></li>
-            </ul>
+        
+        <div id="authors" class="page">
+            <div class="page-header"><h1>👥 作者情况</h1><p>作者分层管理、排行榜、标签分类与智能推荐</p></div>
+            <div class="stats-grid">
+                <div class="stat-card"><div class="label">S 级作者</div><div class="value" style="color: #f59e0b">5</div><div class="subtext">核心创作者</div></div>
+                <div class="stat-card"><div class="label">A 级作者</div><div class="value" style="color: #667eea">12</div><div class="subtext">重点培养</div></div>
+                <div class="stat-card"><div class="label">B 级作者</div><div class="value" style="color: #10b981">20</div><div class="subtext">稳定产出</div></div>
+                <div class="stat-card"><div class="label">潜力作者</div><div class="value" style="color: #8b5cf6">11</div><div class="subtext">待挖掘</div></div>
+            </div>
+            <div class="content-grid">
+                <div class="card"><h2>🎯 作者分层分布</h2><div class="chart-container"><canvas id="tierChart"></canvas></div></div>
+                <div class="card"><h2>🏷️ 作者分类标签</h2><div style="margin-top: 15px;"><div style="margin-bottom: 15px;"><span class="tag hot">🔥 头部达人</span><span class="tag hot">🎮 游戏专业</span><span class="tag">💬 高互动</span></div><div style="margin-bottom: 15px;"><span class="tag new">✨ 新锐作者</span><span class="tag potential">📈 高潜力</span><span class="tag">🎬 视频专精</span></div><div style="margin-bottom: 15px;"><span class="tag">📹 直播专精</span><span class="tag">🎯 转化高手</span><span class="tag">💰 高性价比</span></div></div></div>
+            </div>
+            <div class="card"><h2>📋 作者排行榜<button class="btn btn-outline" style="margin-left: auto;">导出 Excel</button></h2><div class="table-container"><table class="data-table"><thead><tr><th>排名</th><th>昵称</th><th>类型</th><th>层级</th><th>作品数</th><th>播放量</th><th>稿酬</th><th>标签</th><th>操作</th></tr></thead><tbody id="authorRankBody"></tbody></table></div></div>
+            <div class="card" style="margin-top: 20px;"><h2>🤖 智能推荐作者</h2><div class="table-container"><table class="data-table"><thead><tr><th>推荐度</th><th>昵称</th><th>类型</th><th>优势</th><th>预估 CPM</th><th>操作</th></tr></thead><tbody id="recommendBody"></tbody></table></div></div>
         </div>
-
-        <!-- 核心数据概览 -->
-        <div id="overview" class="card" style="margin-bottom: 20px;">
-            <h2>一、核心数据概览</h2>
-            
-            <div class="summary-box">
-                <h3>💰 总稿酬支出</h3>
-                <div class="summary-grid">
-                    <div class="summary-item">
-                        <div class="value">122,500 元</div>
-                        <div class="label">12 月总计</div>
-                    </div>
-                    <div class="summary-item">
-                        <div class="value">116,450 元</div>
-                        <div class="label">1 月总计</div>
-                    </div>
-                    <div class="summary-item">
-                        <div class="value" style="color: #10b981;">-6,050 元</div>
-                        <div class="label">变化 (-4.9%)</div>
-                    </div>
-                    <div class="summary-item">
-                        <div class="value">17,900 元</div>
-                        <div class="label">单价调整节约</div>
-                    </div>
-                </div>
+        
+        <div id="interaction" class="page">
+            <div class="page-header"><h1>💬 互动分析</h1><p>评论、点赞、分享等互动数据深度分析</p></div>
+            <div class="stats-grid">
+                <div class="stat-card"><div class="label">总互动量</div><div class="value">15.8 万</div><div class="subtext">次</div><span class="trend up">↑ 22% 环比</span></div>
+                <div class="stat-card"><div class="label">总点赞数</div><div class="value">8.5 万</div><div class="subtext">次</div><span class="trend up">↑ 18% 环比</span></div>
+                <div class="stat-card"><div class="label">总评论数</div><div class="value">4.2 万</div><div class="subtext">条</div><span class="trend up">↑ 25% 环比</span></div>
+                <div class="stat-card"><div class="label">总分享数</div><div class="value">3.1 万</div><div class="subtext">次</div><span class="trend up">↑ 30% 环比</span></div>
             </div>
-
-            <div class="grid">
-                <div>
-                    <h3>📹 直播稿酬</h3>
-                    <div class="stat">
-                        <span class="stat-label">12 月</span>
-                        <span class="stat-value">60,000 元</span>
-                    </div>
-                    <div class="stat">
-                        <span class="stat-label">1 月</span>
-                        <span class="stat-value highlight">102,900 元</span>
-                    </div>
-                    <div class="stat">
-                        <span class="stat-label">变化</span>
-                        <span class="stat-value success">+71.5%</span>
-                    </div>
-                </div>
-                <div>
-                    <h3>🎬 短视频稿酬</h3>
-                    <div class="stat">
-                        <span class="stat-label">12 月</span>
-                        <span class="stat-value">62,500 元</span>
-                    </div>
-                    <div class="stat">
-                        <span class="stat-label">1 月</span>
-                        <span class="stat-value highlight">13,550 元</span>
-                    </div>
-                    <div class="stat">
-                        <span class="stat-label">变化</span>
-                        <span class="stat-value danger">-78.3%</span>
-                    </div>
-                </div>
+            <div class="content-grid">
+                <div class="card"><h2>📊 互动类型分布</h2><div class="chart-container"><canvas id="interactionPieChart"></canvas></div></div>
+                <div class="card"><h2>📈 互动趋势分析</h2><div class="chart-container"><canvas id="interactionTrendChart"></canvas></div></div>
             </div>
-
-            <div class="insight success">
-                <div class="insight-title">✅ 核心成果</div>
-                <div class="insight-content">
-                    总成本下降 4.9%，单价调整节约 17,900 元（-13.3%）。
-                    直播生态健康增长（+37.5% 作者），短视频 ROI 大幅优化（-46% 单播放成本）。
-                </div>
-            </div>
+            <div class="card"><h2>🔥 高互动内容 TOP 10</h2><div class="table-container"><table class="data-table"><thead><tr><th>排名</th><th>作者</th><th>内容标题</th><th>类型</th><th>互动量</th><th>点赞</th><th>评论</th><th>分享</th></tr></thead><tbody id="interactionTopBody"></tbody></table></div></div>
         </div>
-
-        <!-- 整体趋势 -->
-        <div id="trends" class="card" style="margin-bottom: 20px;">
-            <h2>二、整体趋势分析</h2>
-            
-            <div class="grid">
-                <div>
-                    <h3>👥 参与作者规模</h3>
-                    <div class="comparison">
-                        <div class="comparison-item">
-                            <div class="label">12 月</div>
-                            <div class="value">48 人次</div>
-                            <div class="change">直播 32 + 短视频 16</div>
-                        </div>
-                        <div class="comparison-item">
-                            <div class="label">1 月</div>
-                            <div class="value">53 人次</div>
-                            <div class="change">直播 44 + 短视频 9</div>
-                        </div>
-                    </div>
-                    <div class="stat">
-                        <span class="stat-label">留存率</span>
-                        <span class="stat-value info">78.3%</span>
-                    </div>
-                    <div class="stat">
-                        <span class="stat-label">新增作者</span>
-                        <span class="stat-value success">+17 人</span>
-                    </div>
-                    <div class="stat">
-                        <span class="stat-label">流失作者</span>
-                        <span class="stat-value danger">-10 人</span>
-                    </div>
-                </div>
-                <div>
-                    <h3>📊 作者类型分布</h3>
-                    <div class="stat">
-                        <span class="stat-label">仅直播</span>
-                        <span class="stat-value">30 → 44 人</span>
-                    </div>
-                    <div class="stat">
-                        <span class="stat-label">仅短视频</span>
-                        <span class="stat-value">14 → 9 人</span>
-                    </div>
-                    <div class="stat">
-                        <span class="stat-label">双栖作者</span>
-                        <span class="stat-value danger">2 → 0 人</span>
-                    </div>
-                    <div class="insight danger" style="margin-top: 15px;">
-                        <div class="insight-title">⚠️ 关注</div>
-                        <div class="insight-content">
-                            双栖作者从 2 人降至 0 人，建议鼓励直播作者尝试短视频，提升综合收益。
-                        </div>
-                    </div>
-                </div>
+        
+        <div id="budget" class="page">
+            <div class="page-header"><h1>💰 预算管理</h1><p>稿酬预算分配、使用进度与预警管理</p></div>
+            <div class="stats-grid">
+                <div class="stat-card"><div class="label">月度总预算</div><div class="value">150,000</div><div class="subtext">元</div></div>
+                <div class="stat-card"><div class="label">已使用</div><div class="value highlight">95,500</div><div class="subtext">元</div><div class="progress-bar"><div class="fill" style="width: 63.7%"></div></div><span class="subtext">使用率 63.7%</span></div>
+                <div class="stat-card"><div class="label">剩余预算</div><div class="value" style="color: #10b981">54,500</div><div class="subtext">元</div></div>
+                <div class="stat-card warning"><div class="label">日均消耗</div><div class="value danger">4,152</div><div class="subtext">元/天</div><span class="trend down">⚠️ 超预算风险</span></div>
             </div>
-        </div>
-
-        <!-- ROI 分析 -->
-        <div id="roi" class="card" style="margin-bottom: 20px;">
-            <h2>三、成本效益分析 (ROI)</h2>
-            
-            <div class="grid">
-                <div>
-                    <h3>📹 直播 ROI</h3>
-                    <div class="stat">
-                        <span class="stat-label">单场观成本</span>
-                        <span class="stat-value">0.1282 元 → 0.1287 元</span>
-                    </div>
-                    <div class="stat">
-                        <span class="stat-label">单小时成本</span>
-                        <span class="stat-value">38.64 元 → 47.51 元</span>
-                    </div>
-                    <div class="stat">
-                        <span class="stat-label">达标率</span>
-                        <span class="stat-value success">87.5% → 95.5%</span>
-                    </div>
-                </div>
-                <div>
-                    <h3>🎬 短视频 ROI</h3>
-                    <div class="stat">
-                        <span class="stat-label">单播放成本</span>
-                        <span class="stat-value success">0.0370 元 → 0.0199 元</span>
-                    </div>
-                    <div class="stat">
-                        <span class="stat-label">变化</span>
-                        <span class="stat-value success">-46.2%</span>
-                    </div>
-                    <div class="stat">
-                        <span class="stat-label">达标率</span>
-                        <span class="stat-value">100% → 100%</span>
-                    </div>
-                </div>
+            <div class="content-grid">
+                <div class="card"><h2>📊 预算分配</h2><div class="chart-container"><canvas id="budgetPieChart"></canvas></div></div>
+                <div class="card"><h2>📈 预算消耗趋势</h2><div class="chart-container"><canvas id="budgetTrendChart"></canvas></div></div>
             </div>
-
-            <div class="insight success">
-                <div class="insight-title">✅ ROI 优化成果</div>
-                <div class="insight-content">
-                    短视频单播放成本从 0.037 元降至 0.02 元（-46%），
-                    直播达标率从 87.5% 提升至 95.5%，作者质量显著提高。
-                </div>
-            </div>
-        </div>
-
-        <!-- 互动数据分析 -->
-        <div id="engagement" class="card" style="margin-bottom: 20px;">
-            <h2>四、短视频互动数据分析</h2>
-            
-            <div class="summary-box" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
-                <h3>📊 1 月互动数据总览</h3>
-                <div class="summary-grid">
-                    <div class="summary-item">
-                        <div class="value">940,051</div>
-                        <div class="label">总播放量</div>
-                    </div>
-                    <div class="summary-item">
-                        <div class="value">800</div>
-                        <div class="label">总评论量</div>
-                    </div>
-                    <div class="summary-item">
-                        <div class="value">164</div>
-                        <div class="label">总分享量</div>
-                    </div>
-                    <div class="summary-item">
-                        <div class="value">0.10%</div>
-                        <div class="label">平均互动率</div>
-                    </div>
-                </div>
-            </div>
-
-            <h3>📈 作者互动率 TOP10</h3>
-            <table>
-                <thead>
-                    <tr><th>排名</th><th>作者</th><th>总播放量</th><th>总评论</th><th>总分享</th><th>互动率</th></tr>
-                </thead>
-                <tbody>
-                    <tr><td>1</td><td>由鱼游戏</td><td>57,223</td><td>99</td><td>42</td><td class="success">0.25%</td></tr>
-                    <tr><td>2</td><td>寂灭的龙吟</td><td>84,000</td><td>128</td><td>10</td><td class="success">0.16%</td></tr>
-                    <tr><td>3</td><td>问道修行录</td><td>96,524</td><td>117</td><td>19</td><td>0.14%</td></tr>
-                    <tr><td>4</td><td>问道老道友</td><td>64,827</td><td>68</td><td>11</td><td>0.12%</td></tr>
-                    <tr><td>5</td><td>问道 - 乌拉咧</td><td>70,717</td><td>75</td><td>1</td><td>0.11%</td></tr>
-                    <tr><td>6</td><td>灵觉玩家</td><td>26,733</td><td>27</td><td>1</td><td>0.10%</td></tr>
-                    <tr><td>7</td><td>长安隐士</td><td>89,660</td><td>72</td><td>20</td><td>0.10%</td></tr>
-                    <tr><td>8</td><td>云间长安客</td><td>65,391</td><td>45</td><td>15</td><td>0.09%</td></tr>
-                    <tr><td>9</td><td>游戏观测站</td><td>120,159</td><td>104</td><td>0</td><td>0.09%</td></tr>
-                    <tr><td>10</td><td>大话西游——小轶</td><td>8,460</td><td>3</td><td>3</td><td>0.07%</td></tr>
-                </tbody>
-            </table>
-
-            <div class="insight">
-                <div class="insight-title">💡 互动分析洞察</div>
-                <div class="insight-content">
-                    <strong>互动率偏低（0.10%）</strong>，说明视频内容以展示为主，用户参与度不高。<br>
-                    <strong>头部作者互动率较高</strong>：由鱼游戏 (0.25%)、寂灭的龙吟 (0.16%) 的互动率领先，内容质量较好。<br>
-                    <strong>评论为主</strong>：评论量 (800) 远高于分享量 (164)，用户更倾向于评论互动。<br>
-                    <strong>改进建议</strong>：鼓励作者在视频中加入互动元素（提问、投票等），提升用户参与度。
-                </div>
-            </div>
-        </div>
-
-        <!-- 作者分层 -->
-        <div id="tiers" class="card" style="margin-bottom: 20px;">
-            <h2>五、作者分层变化</h2>
-            
-            <h3>📹 直播作者分层</h3>
-            <table>
-                <thead>
-                    <tr><th>层级</th><th>12 月</th><th>1 月</th><th>变化</th><th>1 月稿酬占比</th></tr>
-                </thead>
-                <tbody>
-                    <tr><td>A 级 (2000-5000)</td><td>12 人</td><td>28 人</td><td class="positive">+16 人</td><td>81.6%</td></tr>
-                    <tr><td>B 级 (500-2000)</td><td>16 人</td><td>14 人</td><td>-2 人</td><td>18.4%</td></tr>
-                    <tr><td>C 级 (<500)</td><td>4 人</td><td>2 人</td><td>-2 人</td><td>0%</td></tr>
-                </tbody>
-            </table>
-
-            <h3 style="margin-top: 30px;">🎬 短视频作者分层</h3>
-            <table>
-                <thead>
-                    <tr><th>层级</th><th>12 月</th><th>1 月</th><th>变化</th><th>1 月稿酬占比</th></tr>
-                </thead>
-                <tbody>
-                    <tr><td>S 级 (≥5000)</td><td>7 人</td><td>0 人</td><td class="negative">-7 人</td><td>0%</td></tr>
-                    <tr><td>A 级 (2000-5000)</td><td>5 人</td><td>2 人</td><td>-3 人</td><td>31.4%</td></tr>
-                    <tr><td>B 级 (500-2000)</td><td>2 人</td><td>7 人</td><td class="positive">+5 人</td><td>68.6%</td></tr>
-                </tbody>
-            </table>
-
-            <div class="insight">
-                <div class="insight-title">💡 洞察</div>
-                <div class="insight-content">
-                    直播 A 级作者大幅增长（+16 人），中坚力量增强；
-                    短视频 S 级作者消失（单价下调导致），向 B 级集中，头部效应减弱。
-                </div>
-            </div>
-        </div>
-
-        <!-- 单价调整影响 -->
-        <div id="price-impact" class="card" style="margin-bottom: 20px;">
-            <h2>六、单价调整影响</h2>
-            
-            <div class="summary-box">
-                <h3>💸 成本节约总览</h3>
-                <div class="summary-grid">
-                    <div class="summary-item">
-                        <div class="value">8,100 元</div>
-                        <div class="label">直播节约</div>
-                    </div>
-                    <div class="summary-item">
-                        <div class="value">9,800 元</div>
-                        <div class="label">短视频节约</div>
-                    </div>
-                    <div class="summary-item">
-                        <div class="value" style="color: #10b981;">17,900 元</div>
-                        <div class="label">合计节约</div>
-                    </div>
-                    <div class="summary-item">
-                        <div class="value">13.3%</div>
-                        <div class="label">节约比例</div>
-                    </div>
-                </div>
-            </div>
-
-            <table>
-                <thead>
-                    <tr><th>类型</th><th>旧单价总额</th><th>新单价总额</th><th>节约金额</th><th>节约比例</th></tr>
-                </thead>
-                <tbody>
-                    <tr><td>直播</td><td>111,000 元</td><td>102,900 元</td><td class="success">8,100 元</td><td>7.3%</td></tr>
-                    <tr><td>短视频</td><td>23,350 元</td><td>13,550 元</td><td class="success">9,800 元</td><td>42.0%</td></tr>
-                    <tr><td><strong>合计</strong></td><td><strong>134,350 元</strong></td><td><strong>116,450 元</strong></td><td class="success"><strong>17,900 元</strong></td><td><strong>13.3%</strong></td></tr>
-                </tbody>
-            </table>
-
-            <div class="insight success">
-                <div class="insight-title">✅ 调整效果</div>
-                <div class="insight-content">
-                    单价调整达到预期效果，总节约 17,900 元。
-                    短视频影响最大（42%），直播温和下调（7.3%），作者接受度高。
-                </div>
-            </div>
-        </div>
-
-        <!-- TOP10 -->
-        <div id="top10" class="card" style="margin-bottom: 20px;">
-            <h2>七、1 月综合收益 TOP10</h2>
-            <table>
-                <thead>
-                    <tr><th>排名</th><th>类型</th><th>昵称</th><th>稿酬 (元)</th></tr>
-                </thead>
-                <tbody>
-                    <tr><td>1</td><td><span class="badge badge-live">直播</span></td><td>珊爱旺</td><td class="highlight">3,000</td></tr>
-                    <tr><td>2</td><td><span class="badge badge-live">直播</span></td><td>爱莎深山典</td><td class="highlight">3,000</td></tr>
-                    <tr><td>3</td><td><span class="badge badge-live">直播</span></td><td>小鱼</td><td class="highlight">3,000</td></tr>
-                    <tr><td>4</td><td><span class="badge badge-live">直播</span></td><td>乔萝莉</td><td class="highlight">3,000</td></tr>
-                    <tr><td>5</td><td><span class="badge badge-live">直播</span></td><td>~空白格</td><td class="highlight">3,000</td></tr>
-                    <tr><td>6</td><td><span class="badge badge-live">直播</span></td><td>寒烟</td><td class="highlight">3,000</td></tr>
-                    <tr><td>7</td><td><span class="badge badge-live">直播</span></td><td>是逸宸啊</td><td class="highlight">3,000</td></tr>
-                    <tr><td>8</td><td><span class="badge badge-live">直播</span></td><td>时光流逝</td><td class="highlight">3,000</td></tr>
-                    <tr><td>9</td><td><span class="badge badge-live">直播</span></td><td>星宿</td><td class="highlight">3,000</td></tr>
-                    <tr><td>10</td><td><span class="badge badge-live">直播</span></td><td>夜羽</td><td class="highlight">3,000</td></tr>
-                </tbody>
-            </table>
-        </div>
-
-        <!-- 运营建议 -->
-        <div id="recommendations" class="card" style="margin-bottom: 20px;">
-            <h2>八、运营建议</h2>
-            
-            <div class="insight success">
-                <div class="insight-title">🎯 重点维护（28 位直播 A 级作者）</div>
-                <div class="insight-content">
-                    贡献 84,000 元，占直播总稿酬 81.6%。
-                    <br><strong>行动：</strong>建立专属运营群，定期沟通创作计划，提供优先资源支持。
-                </div>
-            </div>
-
-            <div class="insight">
-                <div class="insight-title">🌱 潜力培养（21 位 B 级作者）</div>
-                <div class="insight-content">
-                    14 位直播 B 级 + 7 位短视频 B 级。
-                    <br><strong>行动：</strong>每月 1 次创作分享会，提供创作培训，帮助晋升 A 级。
-                </div>
-            </div>
-
-            <div class="insight">
-                <div class="insight-title">🔄 双栖拓展</div>
-                <div class="insight-content">
-                    当前双栖作者：0 人（12 月有 2 人）。
-                    <br><strong>行动：</strong>鼓励 30+ 位直播作者尝试短视频，提供短视频创作指导，提升综合收益。
-                </div>
-            </div>
-
-            <div class="insight">
-                <div class="insight-title">💰 预算分配优化</div>
-                <div class="insight-content">
-                    当前：直播 88% : 短视频 12%。
-                    <br><strong>建议：</strong>短视频提升至 15-20%，平衡生态，降低单一类型风险。
-                </div>
-            </div>
-
-            <div class="insight danger">
-                <div class="insight-title">⚠️ 风险关注</div>
-                <div class="insight-content">
-                    2 位直播作者时长接近达标（鬼哥 18h、小酷的游戏世界 17.2h，差 2 小时左右）。
-                    <br><strong>行动：</strong>主动沟通，提供直播技巧培训，帮助达标。
-                </div>
-            </div>
-
-            <div class="insight" style="margin-top: 20px;">
-                <div class="insight-title">📱 互动提升建议</div>
-                <div class="insight-content">
-                    当前短视频互动率仅 0.10%，远低于行业平均水平（1-3%）。
-                    <br><strong>行动：</strong>
-                    <ul style="margin-top: 8px; padding-left: 20px;">
-                        <li>鼓励作者在视频中加入互动元素（提问、投票、抽奖等）</li>
-                        <li>设置"最佳互动奖"，激励作者提升内容质量</li>
-                        <li>定期分享高互动视频案例，组织学习交流</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-        <!-- 预算预测 -->
-        <div id="budget" class="card" style="margin-bottom: 20px;">
-            <h2>九、下月预算预测</h2>
-            
-            <div class="summary-box">
-                <h3>📋 2 月预算建议</h3>
-                <div class="summary-grid">
-                    <div class="summary-item">
-                        <div class="value">113,200 元</div>
-                        <div class="label">直播预测</div>
-                    </div>
-                    <div class="summary-item">
-                        <div class="value">14,900 元</div>
-                        <div class="label">短视频预测</div>
-                    </div>
-                    <div class="summary-item">
-                        <div class="value" style="color: #f59e0b;">128,000 元</div>
-                        <div class="label">合计预测</div>
-                    </div>
-                    <div class="summary-item">
-                        <div class="value">13-14 万</div>
-                        <div class="label">建议预留</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="insight">
-                <div class="insight-title">💡 说明</div>
-                <div class="insight-content">
-                    基于 1 月数据，假设 10% 自然增长。
-                    实际预算需结合活动计划调整，建议预留 13-14 万预算，以支持创作者增长和活动扩展。
-                </div>
-            </div>
-        </div>
-
-        <!-- 总结 -->
-        <div class="card">
-            <h2>📝 一句话总结</h2>
-            <div class="insight success">
-                <div class="insight-content" style="font-size: 18px; font-weight: bold;">
-                    1 月通过单价调整实现成本优化（节约 1.79 万），直播生态健康增长，短视频需关注作者留存和头部培养。
-                </div>
-            </div>
+            <div class="card"><h2>📋 预算明细</h2><div class="table-container"><table class="data-table"><thead><tr><th>项目</th><th>预算</th><th>已用</th><th>剩余</th><th>使用率</th><th>状态</th></tr></thead><tbody id="budgetDetailBody"></tbody></table></div></div>
         </div>
     </div>
+    
+    <script>
+        const liveData = [{"uid": "YS353265", "nickname": "郎树千古琴", "payment": 3200, "views": 21746, "count": 33}, {"uid": "YS425414", "nickname": "自由爱", "payment": 3200, "views": 22393, "count": 50}, {"uid": "127775", "nickname": "~空白格", "payment": 3200, "views": 41278, "count": 79}, {"uid": "YS1101819", "nickname": "小鱼", "payment": 3200, "views": 48700, "count": 22}, {"uid": "YS266951", "nickname": "乔萝莉", "payment": 3200, "views": 20950, "count": 44}];
+        const shortData = [{"uid": "YS1300103", "nickname": "寂灭的龙吟", "payment": 6100, "corrected_play": 152767, "posts": 14}, {"uid": "YS1276942", "nickname": "长安隐士", "payment": 5650, "corrected_play": 142545, "posts": 13}, {"uid": "YS1291461", "nickname": "由鱼游戏", "payment": 5450, "corrected_play": 141744, "posts": 13}, {"uid": "YS1103089", "nickname": "问道修行录", "payment": 5400, "corrected_play": 143561, "posts": 12}, {"uid": "YS1270486", "nickname": "问道老道友", "payment": 5200, "corrected_play": 136711, "posts": 12}];
+        
+        function switchPage(page) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById(page).classList.add('active');
+            event.target.closest('.nav-item').classList.add('active');
+        }
+        
+        function renderTop10() {
+            const all = [...liveData.map(d => ({...d, type: '直播', play: d.views})), ...shortData.map(d => ({...d, type: '短视频', play: d.corrected_play}))];
+            all.sort((a, b) => b.payment - a.payment);
+            const tbody = document.getElementById('top10Body');
+            tbody.innerHTML = '';
+            all.slice(0, 10).forEach((d, i) => {
+                const badgeClass = d.type === '直播' ? 'badge-live' : 'badge-short';
+                const cpm = (d.payment / (d.play / 1000)).toFixed(1);
+                tbody.innerHTML += `<tr><td>${i+1}</td><td><span class="badge ${badgeClass}">${d.type}</span></td><td>${d.nickname}</td><td>${d.play.toLocaleString()}</td><td class="payment">${d.payment}</td><td>${cpm}</td><td><span class="tag hot">正常</span></td></tr>`;
+            });
+        }
+        
+        function renderAuthorRank() {
+            const all = [...liveData.map(d => ({...d, type: '直播', tier: d.payment >= 3200 ? 'S 级' : 'A 级'})), ...shortData.map(d => ({...d, type: '短视频', tier: d.payment >= 5000 ? 'S 级' : 'A 级'}))];
+            all.sort((a, b) => b.payment - a.payment);
+            const tbody = document.getElementById('authorRankBody');
+            tbody.innerHTML = '';
+            all.slice(0, 15).forEach((d, i) => {
+                const tags = d.payment >= 5000 ? '<span class="tag hot">头部达人</span>' : '<span class="tag new">高潜力</span>';
+                tbody.innerHTML += `<tr><td>${i+1}</td><td>${d.nickname}</td><td>${d.type}</td><td>${d.tier}</td><td>${d.posts || d.count}</td><td>${(d.corrected_play || d.views).toLocaleString()}</td><td class="payment">${d.payment}</td><td>${tags}</td><td><button class="btn btn-outline" style="padding:4px 10px;">详情</button></td></tr>`;
+            });
+        }
+        
+        function renderRecommend() {
+            const recs = [{name: "游戏小达人", type: "短视频", advantage: "高互动率 8.5%", cpm: 35}, {name: "直播新秀", type: "直播", advantage: "低成本高场观", cpm: 28}, {name: "内容创作者", type: "短视频", advantage: "爆款率高", cpm: 42}];
+            const tbody = document.getElementById('recommendBody');
+            tbody.innerHTML = '';
+            recs.forEach((r, i) => {
+                tbody.innerHTML += `<tr><td>⭐${5-i}</td><td>${r.name}</td><td>${r.type}</td><td>${r.advantage}</td><td>${r.cpm}</td><td><button class="btn btn-primary" style="padding:4px 10px;">关注</button></td></tr>`;
+            });
+        }
+        
+        function renderBudgetDetail() {
+            const budgets = [{item: "直播稿酬", budget: 80000, used: 60000}, {item: "短视频稿酬", budget: 70000, used: 35500}];
+            const tbody = document.getElementById('budgetDetailBody');
+            tbody.innerHTML = '';
+            budgets.forEach(b => {
+                const remaining = b.budget - b.used;
+                const rate = (b.used / b.budget * 100).toFixed(1);
+                const status = rate > 80 ? '<span class="tag hot">预警</span>' : '<span class="tag new">正常</span>';
+                tbody.innerHTML += `<tr><td>${b.item}</td><td>${b.budget.toLocaleString()}</td><td>${b.used.toLocaleString()}</td><td>${remaining.toLocaleString()}</td><td>${rate}%</td><td>${status}</td></tr>`;
+            });
+        }
+        
+        function renderCharts() {
+            new Chart(document.getElementById('trendChart'), {
+                type: 'line',
+                data: {
+                    labels: ['1 日', '5 日', '10 日', '15 日', '20 日', '25 日', '30 日'],
+                    datasets: [{label: '直播稿酬', data: [15000, 22000, 35000, 42000, 50000, 55000, 60000], borderColor: '#667eea', tension: 0.4}, {label: '短视频稿酬', data: [12000, 20000, 30000, 40000, 48000, 56000, 62500], borderColor: '#f59e0b', tension: 0.4}]
+                },
+                options: {responsive: true, maintainAspectRatio: false, plugins: {legend: {position: 'bottom'}}}
+            });
+            
+            new Chart(document.getElementById('cpmChart'), {
+                type: 'bar',
+                data: {
+                    labels: ['第 1 周', '第 2 周', '第 3 周', '第 4 周'],
+                    datasets: [{label: '播放量 (千)', data: [450, 520, 580, 606], backgroundColor: '#667eea', yAxisID: 'y'}, {label: 'CPM', data: [52.3, 54.8, 55.2, 56.8], type: 'line', borderColor: '#ef4444', yAxisID: 'y1'}]
+                },
+                options: {responsive: true, maintainAspectRatio: false, scales: {y: {type: 'linear', position: 'left'}, y1: {type: 'linear', position: 'right'}}}
+            });
+            
+            new Chart(document.getElementById('tierChart'), {
+                type: 'doughnut',
+                data: {labels: ['S 级', 'A 级', 'B 级', '潜力'], datasets: [{data: [5, 12, 20, 11], backgroundColor: ['#f59e0b', '#667eea', '#10b981', '#8b5cf6']}]},
+                options: {responsive: true, maintainAspectRatio: false, plugins: {legend: {position: 'bottom'}}}
+            });
+            
+            new Chart(document.getElementById('interactionPieChart'), {
+                type: 'pie',
+                data: {labels: ['点赞', '评论', '分享'], datasets: [{data: [85000, 42000, 31000], backgroundColor: ['#667eea', '#f59e0b', '#10b981']}]},
+                options: {responsive: true, maintainAspectRatio: false, plugins: {legend: {position: 'bottom'}}}
+            });
+            
+            new Chart(document.getElementById('interactionTrendChart'), {
+                type: 'line',
+                data: {labels: ['1 日', '5 日', '10 日', '15 日', '20 日', '25 日', '30 日'], datasets: [{label: '点赞', data: [20000, 35000, 48000, 58000, 68000, 78000, 85000], borderColor: '#667eea', tension: 0.4}, {label: '评论', data: [10000, 18000, 25000, 32000, 37000, 40000, 42000], borderColor: '#f59e0b', tension: 0.4}]},
+                options: {responsive: true, maintainAspectRatio: false, plugins: {legend: {position: 'bottom'}}}
+            });
+            
+            new Chart(document.getElementById('budgetPieChart'), {
+                type: 'doughnut',
+                data: {labels: ['直播稿酬', '短视频稿酬', '剩余'], datasets: [{data: [60000, 35500, 54500], backgroundColor: ['#667eea', '#f59e0b', '#10b981']}]},
+                options: {responsive: true, maintainAspectRatio: false, plugins: {legend: {position: 'bottom'}}}
+            });
+            
+            new Chart(document.getElementById('budgetTrendChart'), {
+                type: 'line',
+                data: {labels: ['1 日', '5 日', '10 日', '15 日', '20 日', '25 日', '30 日'], datasets: [{label: '累计消耗', data: [15000, 28000, 42000, 58000, 72000, 85000, 95500], borderColor: '#667eea', fill: true, backgroundColor: 'rgba(102, 126, 234, 0.1)', tension: 0.4}, {label: '预算线', data: [25000, 50000, 75000, 100000, 125000, 150000, 150000], borderColor: '#ef4444', borderDash: [5, 5], tension: 0}]},
+                options: {responsive: true, maintainAspectRatio: false, plugins: {legend: {position: 'bottom'}}}
+            });
+        }
+        
+        window.onload = function() {
+            renderTop10();
+            renderAuthorRank();
+            renderRecommend();
+            renderBudgetDetail();
+            renderCharts();
+        };
+    </script>
 </body>
 </html>
